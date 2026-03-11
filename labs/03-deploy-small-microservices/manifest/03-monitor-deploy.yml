@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitor-deploy
+  labels:
+    app: smart-factory
+    component: monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: factory-monitor
+  template:
+    metadata:
+      labels:
+        app: factory-monitor
+    spec:
+      containers:
+      - name: monitor-container
+        image: factory-monitor:v1
+        imagePullPolicy: Never
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: MQTT_BROKER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: factory-config
+              key: MQTT_BROKER_HOST
+        - name: MQTT_BASE_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: factory-config
+              key: MQTT_BASE_TOPIC
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "100m"
+            memory: "128Mi"

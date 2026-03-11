@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assembly-line-deploy
+  labels:
+    app: smart-factory
+    component: sensor
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: factory-sensor
+  template:
+    metadata:
+      labels:
+        app: factory-sensor
+    spec:
+      containers:
+      - name: factory-simulator
+        image: factory-sensor:v1
+        imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        # Host del broker
+        - name: MQTT_BROKER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: factory-config
+              key: MQTT_BROKER_HOST
+        # Base topic 
+        - name: MQTT_BASE_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: factory-config
+              key: MQTT_BASE_TOPIC
+        # Intervallo
+        - name: SENSOR_INTERVAL
+          valueFrom:
+            config_map_key_ref:
+              name: factory-config
+              key: SENSOR_INTERVAL
