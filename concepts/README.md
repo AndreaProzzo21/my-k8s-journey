@@ -17,9 +17,10 @@ In questa cartella sto raccogliendo approfondimenti su:
 
 ## 📚 Recent References
 
-**Titolo**: Kubernetes Zero to Hero - https://www.youtube.com/watch?v=MTHGoGUFpvE
-**Autore**: Alta3 Research
-**Note**: Questo è il video da cui sono partito e che sto seguendo per le basi di teoria e laboratorio.
+* **Titolo:** [Kubernetes Zero to Hero](https://www.youtube.com/watch?v=MTHGoGUFpvE)
+* **Autore:** Alta3 Research
+* **Note:** Risorsa principale per le basi teoriche e la configurazione del laboratorio.
+
 ---
 
 *Questa cartella è in perenne "Work in Progress". Aggiungerò nuovi file e integrerò quelli esistenti man mano che il mio percorso di studio prosegue e i test nei lab diventano più complessi.*
