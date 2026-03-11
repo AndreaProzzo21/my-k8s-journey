@@ -1,4 +1,4 @@
-# 🩺 Health Checks & Resource Management
+# Health Checks & Resource Management
 
 In questo modulo approfondiamo come Kubernetes monitora la salute delle applicazioni e come possiamo assicurarci che ogni Pod abbia le risorse necessarie per operare senza disturbare il resto del cluster.
 
@@ -83,7 +83,7 @@ spec:
 
 ---
 
-## 🧠 Analisi Teorica: Perché usarli insieme?
+## Analisi Teorica: Perché usarli insieme?
 
 L'unione di **Resource Control** e **Probes** crea un sistema resiliente:
 
