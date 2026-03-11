@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: python-sensor
+  labels:
+    app: iot-demo
+spec:
+  containers:
+  - name: sensor-demo
+    image: my-python-sensor:v1
+    imagePullPolicy: Never          # Fondamentale per immagini locali
+    ports:
+    - containerPort: 8000
+
+    # Iniezione della configMap
+    envFrom:
+    - configMapRef:
+        name: sensor-config
+    
+    # Risorse
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+
+    # Probes (HTTP)
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 5
+      periodSeconds: 10
+
+    # Volume
+    volumeMounts:
+    - name: data-volume
+      mountPath: /data
+
+  volumes:
+  - name: data-volume
+    hostPath:
+      path: /home/docker/sensor-data 
