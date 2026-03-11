@@ -19,7 +19,6 @@ Ogni laboratorio (file o cartella) mira a essere riproducibile e include:
 
 ---
 
-> 💡 **Status**: Questa sezione è in continuo aggiornamento. Aggiungerò nuovi laboratori man mano che il mio studio prosegue e le sfide tecniche diventano più interessanti. 🛠️
+*Questa cartella è in perenne "Work in Progress". Aggiungerò nuovi file e integrerò quelli esistenti man mano che il mio percorso di studio prosegue e i test nei lab diventano più complessi.*
 
 ---
-
