@@ -126,7 +126,7 @@ Una caratteristica avanzata delle ConfigMap montate come **volumi** è che se mo
 
 ## Analisi Teorica: Sicurezza e Best Practices
 
-* **ConfigMap vs Secrets:** Le ConfigMap **non sono criptate**. Sono pensate per dati pubblici (porte, URL, nomi). Per password, chiavi API o certificati, Kubernetes mette a disposizione un oggetto simile chiamato **Secret**.
+* **ConfigMap vs Secrets:** Le ConfigMap **non sono criptate**. Sono pensate per dati pubblici (porte, URL, nomi). Per password, chiavi API o certificati, Kubernetes mette a disposizione un oggetto simile chiamato **Secret**, non criptato di default (quindi ipoteticamente visibili sull'API Server tramite kubectl) ma che possiamo criptare con diverse tecniche.
 * **Immutabilità:** Nelle versioni recenti di K8s, puoi segnare una ConfigMap come `immutable: true`. Questo impedisce modifiche accidentali e migliora le performance del cluster.
 
 ---
