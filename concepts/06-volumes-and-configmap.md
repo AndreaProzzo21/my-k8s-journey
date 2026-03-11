@@ -12,6 +12,29 @@ Un **Volume** in Kubernetes (e similarmente in Docker) è essenzialmente una dir
 2. **hostPath**: Monta una directory del file system del nodo ospite (la tua VM Ubuntu) direttamente nel Pod. Utile per test locali o per accedere ai log di sistema.
 3. **PersistentVolume (PV) & Claim (PVC)**: La soluzione professionale. Astrae lo storage fisico (disco cloud, NAS, ecc.) permettendo al Pod di richiedere spazio senza sapere "dove" sia fisicamente.
 
+### Il meccanismo: Volume vs VolumeMount
+
+Per usare un volume, Kubernetes richiede sempre due passaggi nel Manifest, che funzionano come un "ponte":
+
+1. **`spec.volumes` (Dichiarazione)**: Definisce *quale* storage usare e gli dà un nome (es. "presa elettrica"). È a livello di Pod.
+2. **`spec.containers.volumeMounts` (Montaggio)**: Definisce *dove* quel volume deve apparire dentro il file system del container (es. "collego il cavo"). È a livello di singolo container.
+
+---
+
+### Sotto-sezione sulla Persistenza Professionale:
+
+### L'astrazione PV e PVC (Il contratto di affitto)
+
+Se i volumi `hostPath` o `emptyDir` sono legati al ciclo di vita del nodo o del pod, per i database e i dati storici degli asset industriali si usa il sistema **PV/PVC**:
+
+* **PersistentVolume (PV)**: È la risorsa fisica (es. un disco da 50GB creato dall'amministratore).
+* **PersistentVolumeClaim (PVC)**: È la richiesta dell'utente ("Mi servono 10GB con permessi di scrittura").
+* **StorageClass**: È l'automatismo che crea il disco appena lo richiedi (molto usato in Cloud o con Minikube).
+
+**Perché usarlo?** Se il Pod si sposta su un altro server (nodo), Kubernetes scollega il disco dal vecchio server e lo riattacca al nuovo. I tuoi dati "viaggiano" con l'app.
+
+> 💡 **Tip:** Poiché i Volumi sono definiti a livello di **Pod**, due container nello stesso Pod possono montare lo **stesso volume** (anche in cartelle diverse). Questo è il modo più veloce per far comunicare due processi (es. uno scrive un file di log, l'altro lo legge e lo invia a una dashboard).
+
 ---
 
 ## 2. ConfigMap: Separare il Codice dalla Configurazione
@@ -138,4 +161,7 @@ spec:
 
 ```
 ---
+
+
+
 
