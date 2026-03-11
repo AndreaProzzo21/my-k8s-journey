@@ -24,7 +24,7 @@ eval $(minikube docker-env)
 docker build -t my-python-sensor:v1 .
 
 # 2. Deploy dei manifest
-kubectl apply -f configmap_manifest.yml
+kubectl apply -f configmap.yml
 kubectl apply -f pod_manifest.yml
 
 # 3. Test dell'endpoint (Port Forwarding)
