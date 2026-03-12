@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simulator-deployment
+  labels:
+    app: pdm-simulator
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: pdm-simulator
+  template:
+    metadata:
+      labels:
+        app: pdm-simulator
+    spec:
+      containers:
+      - name: simulator
+        image: pdm-simulator:v1
+        imagePullPolicy: Never 
+        envFrom:
+        - configMapRef:
+            name: simulator-config # Carica TUTTE le variabili dalla ConfigMap
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"

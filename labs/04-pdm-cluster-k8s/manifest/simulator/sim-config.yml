@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simulator-config
+data:
+  MQTT_BROKER: "mosquitto-service"
+  MQTT_PORT: "1883"
+  SIMULATION_MODE: "NOMINAL" # Prova a cambiarlo in STRESS o NOMINAL
+  PUMPS_PER_POD: "3"
+  INTERVAL_SECONDS: "5"
+  BASE_TOPIC: "factory/pumps"

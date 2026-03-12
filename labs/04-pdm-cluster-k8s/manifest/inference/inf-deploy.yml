@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inference-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pdm-inference
+  template:
+    metadata:
+      labels:
+        app: pdm-inference
+    spec:
+      containers:
+      - name: inference
+        image: pdm-inference:v1
+        imagePullPolicy: Never
+        envFrom:
+        - configMapRef:
+            name: inference-config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"

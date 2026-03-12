@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inference-config
+data:
+  MQTT_BROKER: "mosquitto-service"
+  MQTT_PORT: "1883"
+  MQTT_INPUT_TOPIC: "factory/pumps/+/telemetry"
+  MODEL_DIR: "/app/models"
+  
