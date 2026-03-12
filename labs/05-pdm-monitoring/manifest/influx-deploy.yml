@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb:2.7
+        ports:
+        - containerPort: 8086
+        env:
+        # Queste devono coincidere con la ConfigMap del Monitoring!
+        - name: DOCKER_INFLUXDB_INIT_MODE
+          value: setup
+        - name: DOCKER_INFLUXDB_INIT_USERNAME
+          value: admin
+        - name: DOCKER_INFLUXDB_INIT_PASSWORD
+          value: "password123" 
+        - name: DOCKER_INFLUXDB_INIT_ORG
+          value: pdm_org
+        - name: DOCKER_INFLUXDB_INIT_BUCKET
+          value: pdm_data
+        - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+          value: "my-super-secret-admin-token"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb-service
+spec:
+  selector:
+    app: influxdb
+  ports:
+    - protocol: TCP
+      port: 8086
+      targetPort: 8086
