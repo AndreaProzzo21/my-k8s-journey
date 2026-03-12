@@ -1,1 +1,25 @@
-labs/04-pdm-cluster-k8s/models/*
+# --- ML Models ---
+# Ignoro i binari dei modelli in qualsiasi sottocartella models
+**/models/*.pkl
+
+# --- Python ---
+# Evitiamo di caricare i bytecode e le cache di libreria
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+
+# --- System & IDE ---
+# File spazzatura di macOS e Windows
+.DS_Store
+Thumbs.db
+# Cartelle delle impostazioni dell'IDE (VSCode/PyCharm)
+.vscode/
+.idea/
+
+# --- Lab/K8s Temporaries ---
+# Eventuali log locali o file di stato di minikube se scaricati
+*.log
+.minikube/
