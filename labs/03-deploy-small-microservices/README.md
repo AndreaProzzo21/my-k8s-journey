@@ -8,7 +8,7 @@ Sebbene i componenti siano script elementari senza persistenza su database, l'es
 
 ---
 
-## 🏗️ Step 1: Il Simulatore del Reparto (Sensor-Sim)
+## 🏗️ Step 1: Il Simulatore della factory
 
 Il primo componente creato è un simulatore Python che genera dati fittizi di temperatura e vibrazioni, modellando una stazione di assemblaggio.
 
