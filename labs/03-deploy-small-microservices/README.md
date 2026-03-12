@@ -1,4 +1,4 @@
-# 🧪 Lab 03: Deployment e Microservizi MQTT
+# Lab 03: Deployment e Microservizi MQTT
 
 ## 🎯 Scopo del Laboratorio
 
