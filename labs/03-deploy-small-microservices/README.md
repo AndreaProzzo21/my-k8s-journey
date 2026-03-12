@@ -70,7 +70,7 @@ kubectl apply -f 01-mosquitto-setup.yaml
 
 3. **Lancio dei microservizi (Sensori e Monitor):**
 ```bash
-kubectl apply -f 02-sensor-deploy.yaml
+kubectl apply -f 02-factory-deploy.yaml
 kubectl apply -f 03-monitor-deploy.yaml
 
 ```
