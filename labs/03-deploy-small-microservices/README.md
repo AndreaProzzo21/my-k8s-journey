@@ -58,20 +58,20 @@ Per mettere in funzione l'intera infrastruttura, abbiamo seguito un ordine logic
 
 1. **Inizializzazione configurazioni:**
 ```bash
-kubectl apply -f 00-factory-configmap.yaml
+kubectl apply -f 00-factory-configmap.yml
 
 ```
 
 2. **Lancio dell'infrastruttura di rete (Broker):**
 ```bash
-kubectl apply -f 01-mosquitto-setup.yaml
+kubectl apply -f 01-mosquitto-setup.yml
 
 ```
 
 3. **Lancio dei microservizi (Sensori e Monitor):**
 ```bash
-kubectl apply -f 02-factory-deploy.yaml
-kubectl apply -f 03-monitor-deploy.yaml
+kubectl apply -f 02-factory-deploy.yml
+kubectl apply -f 03-monitor-deploy.yml
 
 ```
 
