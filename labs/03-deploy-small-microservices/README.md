@@ -46,7 +46,7 @@ Abbiamo sviluppato un secondo microservizio dedicato esclusivamente all'ascolto 
 
 ```bash
 # Build dell'immagine del monitor
-docker build -t factory-monitor:v1 ./monitor
+docker build -t factory-monitor:v1 ./monitoring-ms
 
 ```
 
