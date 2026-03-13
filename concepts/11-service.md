@@ -7,17 +7,33 @@ In Kubernetes, i Pod sono progettati per essere temporanei. Se un Pod muore, un 
 * Ogni nuovo Pod riceve un **indirizzo IP dinamico**.
 * È impossibile configurare un client (es. un frontend) affinché punti direttamente all'IP di un Pod, perché quell'IP cambierà.
 
-**La Soluzione:** Il **Service**. Un'astrazione che definisce un set logico di Pod e una politica per accedervi. Il Service fornisce un **IP statico** e un **nome DNS** che rimangono invariati per tutta la vita del servizio.
+**La Soluzione:** Il **Service**. Un'astrazione che fornisce un **IP statico** (Virtual IP) e un **nome DNS** che rimangono invariati per tutta la vita del servizio, indipendentemente da quanti Pod vengano creati o distrutti.
 
 ---
 
-## 2. Anatomia di un Service (Labels & Selectors)
+## 2. Come funziona "Sotto il Cofano": Kube-Proxy ed Endpoints
+
+Mentre il Service è un concetto logico, il lavoro sporco viene fatto da due componenti tecnici:
+
+### A. Gli Endpoints
+
+Ogni volta che crei un Service con un selettore, Kubernetes crea automaticamente un oggetto chiamato **Endpoints**. Questo oggetto contiene la lista in tempo reale degli indirizzi IP di tutti i Pod sani (Healty) che corrispondono alle etichette (`Labels`).
+
+### B. Kube-Proxy: Il vigile urbano
+
+In ogni nodo del cluster gira un componente chiamato **kube-proxy**. Il suo compito è monitorare il Control Plane per nuovi Service ed Endpoints.
+
+* **IP Table Manager**: Kube-proxy aggiorna le regole di rete (solitamente tramite `iptables` o `IPVS`) su ogni nodo.
+* **Load Balancing**: Quando un Pod tenta di connettersi all'IP del Service, kube-proxy intercetta la richiesta e agisce come un bilanciatore di carico (di default usa l'algoritmo **Round Robin**), smistando il traffico verso uno degli IP presenti nella lista degli Endpoints.
+
+---
+
+## 3. Anatomia di un Service (Labels & Selectors)
 
 Il legame tra un Service e i Pod non è basato sull'IP, ma sulle **Labels**.
 
 * **Labels**: Etichette applicate ai Pod (es. `app: backend`).
 * **Selector**: Filtro definito nel Service per trovare i Pod da servire.
-* **Endpoints**: Kubernetes crea automaticamente un oggetto "Endpoints" che contiene la lista aggiornata degli IP dei Pod che corrispondono al selettore.
 
 ### Esempio di Manifest YAML
 
@@ -38,74 +54,59 @@ spec:
 
 ---
 
-## 3. Tipologie di Service (Service Types)
-
-Esistono quattro modi principali per esporre un servizio, a seconda di dove si trova il client.
+## 4. Tipologie di Service (Service Types)
 
 ### A. ClusterIP (Default)
 
 Esprime il servizio solo **all'interno del cluster**. È il tipo più comune, usato per la comunicazione tra microservizi interni (es. un Monitoring-Worker che parla con InfluxDB).
 
-* **IP:** Virtuale, raggiungibile solo internamente.
-
 ### B. NodePort
 
-Espone il servizio su una **porta specifica di ogni Nodo** del cluster. Rende il servizio raggiungibile dall'esterno usando `<IP-del-Nodo>:<NodePort>`.
-
-* **Range porte:** 30000 - 32767.
-* **Uso:** Lab, test, o quando non si ha un Load Balancer cloud.
+Espone il servizio su una **porta specifica di ogni Nodo** (range 30000-32767). Rende il servizio raggiungibile dall'esterno usando `<IP-del-Nodo>:<NodePort>`.
 
 ### C. LoadBalancer
 
-Utilizzato in ambienti Cloud (AWS, GCP, Azure). Il provider crea un Load Balancer reale che instrada il traffico verso i nodi.
-
-* **IP:** Pubblico, fornito dal Cloud Provider.
+Utilizzato in Cloud. Il provider crea un Load Balancer reale con un **IP Pubblico** che instrada il traffico verso i nodi del cluster.
 
 ### D. ExternalName
 
-Mappa un servizio a un nome DNS esterno (es. `my-db.external.com`) invece che a un selettore di Pod. Non c'è proxying di traffico, è solo un redirect a livello DNS.
+Mappa un servizio a un nome DNS esterno (es. `db.azienda.it`). È un semplice alias DNS.
 
 ---
 
-## 4. Port Mapping: Chi parla con chi?
+## 5. Port Mapping: Chi parla con chi?
 
-È fondamentale distinguere le tre tipologie di porte:
-
-1. **`port`**: La porta su cui il Service è raggiungibile all'interno del cluster.
-2. **`targetPort`**: La porta su cui l'applicazione è in esecuzione dentro il container.
-3. **`nodePort`**: La porta esterna (solo per tipo NodePort) su cui i client esterni possono connettersi.
+1. **`port`**: Porta del Service (punto di ingresso interno).
+2. **`targetPort`**: Porta del container nel Pod (dove gira l'app).
+3. **`nodePort`**: Porta esterna sul nodo (solo per NodePort).
 
 ```text
-Traffic Flow (NodePort):
-Client -> [Node IP]:[nodePort] -> [Service IP]:[port] -> [Pod IP]:[targetPort]
+Traffic Flow:
+Pod A -> [Service DNS/IP]:[port] -> Kube-Proxy (Round Robin) -> [Pod B IP]:[targetPort]
 
 ```
 
 ---
 
-## 5. Service Discovery & DNS Interno
+## 6. Service Discovery & DNS Interno
 
-Kubernetes include un componente chiamato **CoreDNS**. Ogni volta che crei un Service, viene registrata una voce DNS automatica.
+Kubernetes include **CoreDNS**. Ogni Service riceve un record DNS:
 
-Se il tuo servizio si chiama `influxdb-service` nel namespace `default`, gli altri Pod possono contattarlo semplicemente usando:
-
-* `http://influxdb-service` (se sono nello stesso namespace).
-* `http://influxdb-service.default.svc.cluster.local` (nome completo FQDN).
+* `http://nome-servizio` (stesso namespace).
+* `http://nome-servizio.namespace.svc.cluster.local` (FQDN).
 
 ---
 
-## 6. Best Practices & Troubleshooting
+## 7. Best Practices & Troubleshooting
 
 ### Best Practices
 
-* **Usa nomi per le porte**: Invece di `targetPort: 8080`, definisci un `name: http-web` nel Pod e usa `targetPort: http-web` nel Service. Rende il codice più flessibile.
-* **Evita Session Affinity se non necessaria**: Kubernetes distribuisce il traffico in modo casuale (Round Robin). Se il tuo servizio è stateless, non forzare l'affinità del client a un singolo Pod.
+* **Usa nomi per le porte**: Definisci `name: http-web` nel Pod e usa `targetPort: http-web` nel Service.
+* **Healty Check**: Se un Pod fallisce il `readinessProbe`, Kubernetes lo rimuove automaticamente dagli Endpoints del Service, evitando che `kube-proxy` gli invii traffico.
 
 ### Troubleshooting comuni
 
-* **"Connection Refused"**: Controlla che la `targetPort` nel Service corrisponda esattamente alla `containerPort` definita nel Deployment.
-* **"No Endpoints"**: Se `kubectl get endpoints` è vuoto, significa che il `selector` del Service non corrisponde a nessuna `label` dei Pod. Verifica i typos!
-* **DNS failure**: Prova a fare un `nslookup <nome-servizio>` dall'interno di un Pod per verificare se il CoreDNS sta funzionando.
+* **"No Endpoints"**: Se `kubectl get endpoints` è vuoto, il `selector` non trova Pod con le label giuste.
+* **Kube-Proxy lag**: In rari casi di cluster molto grandi, può esserci un piccolo ritardo nell'aggiornamento delle regole di rete.
 
 ---
-
